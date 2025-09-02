@@ -5,10 +5,10 @@ from qr_generator import generate_qr_code
 import uuid
 
 app = Flask(__name__)
-app.secret_key = 'your-secret-key-here'  # Change this in production
+app.secret_key = os.environ.get('SECRET_KEY', 'your-secret-key-here-change-in-production')
 
-# Create uploads directory
-UPLOAD_FOLDER = 'static/qr_codes'
+# Create uploads directory (use /tmp for Vercel serverless)
+UPLOAD_FOLDER = '/tmp/qr_codes' if os.environ.get('VERCEL') else 'static/qr_codes'
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 @app.route('/')
@@ -37,9 +37,12 @@ def generate():
         
         # Determine output folder based on download location
         if download_location == 'server' and server_path and not server_path.startswith('selected'):
-            # Use custom server path (manual entry)
-            output_folder = os.path.abspath(server_path)
-            os.makedirs(output_folder, exist_ok=True)
+            # For Vercel, we can't create custom directories, so use temp folder
+            if os.environ.get('VERCEL'):
+                output_folder = '/tmp'
+            else:
+                output_folder = os.path.abspath(server_path)
+                os.makedirs(output_folder, exist_ok=True)
         else:
             # Use default upload folder for browser download or file picker
             output_folder = UPLOAD_FOLDER
@@ -120,19 +123,23 @@ def list_files():
     """List all generated QR code files"""
     try:
         files = []
-        for folder in ['static/qr_codes', 'downloads']:
-            if os.path.exists(folder):
-                for filename in os.listdir(folder):
-                    # Look for QR code files (any file with supported extensions)
-                    if filename.endswith(('.png', '.svg', '.eps', '.pdf')):
-                        filepath = os.path.join(folder, filename)
-                        file_size = os.path.getsize(filepath)
-                        files.append({
-                            'name': filename,
-                            'path': filepath,
-                            'size': file_size,
-                            'folder': folder
-                        })
+        # For Vercel, we can't list files from /tmp, so return empty list
+        if os.environ.get('VERCEL'):
+            files = []
+        else:
+            for folder in ['static/qr_codes', 'downloads']:
+                if os.path.exists(folder):
+                    for filename in os.listdir(folder):
+                        # Look for QR code files (any file with supported extensions)
+                        if filename.endswith(('.png', '.svg', '.eps', '.pdf')):
+                            filepath = os.path.join(folder, filename)
+                            file_size = os.path.getsize(filepath)
+                            files.append({
+                                'name': filename,
+                                'path': filepath,
+                                'size': file_size,
+                                'folder': folder
+                            })
         
         # Sort by modification time (newest first)
         files.sort(key=lambda x: os.path.getmtime(x['path']), reverse=True)
@@ -147,11 +154,17 @@ def download_file(filename):
     """Download a specific file"""
     try:
         # Security check - only allow files in allowed directories
-        allowed_dirs = ['static/qr_codes', 'downloads']
-        for allowed_dir in allowed_dirs:
-            filepath = os.path.join(allowed_dir, filename)
-            if os.path.exists(filepath) and os.path.commonpath([os.path.abspath(filepath), os.path.abspath(allowed_dir)]) == os.path.abspath(allowed_dir):
+        if os.environ.get('VERCEL'):
+            # For Vercel, files are in /tmp
+            filepath = os.path.join('/tmp', filename)
+            if os.path.exists(filepath):
                 return send_file(filepath, as_attachment=True)
+        else:
+            allowed_dirs = ['static/qr_codes', 'downloads']
+            for allowed_dir in allowed_dirs:
+                filepath = os.path.join(allowed_dir, filename)
+                if os.path.exists(filepath) and os.path.commonpath([os.path.abspath(filepath), os.path.abspath(allowed_dir)]) == os.path.abspath(allowed_dir):
+                    return send_file(filepath, as_attachment=True)
         
         flash('File not found or access denied', 'error')
         return redirect(url_for('index'))
