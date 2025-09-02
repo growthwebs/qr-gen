@@ -67,3 +67,4 @@ instance/
 # Logs
 *.log
 logs/
+.vercel
