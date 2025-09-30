@@ -112,9 +112,16 @@ def preview():
         
         # Return preview data with cache-busting timestamp
         timestamp = int(time.time() * 1000)  # milliseconds
+        
+        # For Vercel, we need to serve from the correct path
+        if os.environ.get('VERCEL'):
+            preview_url = f'/tmp/qr_codes/{temp_filename}?t={timestamp}'
+        else:
+            preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
+            
         return {
             'success': True,
-            'preview_url': f'/static/qr_codes/{temp_filename}?t={timestamp}',
+            'preview_url': preview_url,
             'filename': temp_filename
         }
         
@@ -177,6 +184,18 @@ def download_file(filename):
     except Exception as e:
         flash(f'Error downloading file: {str(e)}', 'error')
         return redirect(url_for('index'))
+
+@app.route('/tmp/qr_codes/<filename>')
+def serve_temp_qr(filename):
+    """Serve temporary QR code files for preview on Vercel"""
+    try:
+        filepath = os.path.join('/tmp/qr_codes', filename)
+        if os.path.exists(filepath):
+            return send_file(filepath)
+        else:
+            return "File not found", 404
+    except Exception as e:
+        return f"Error serving file: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
