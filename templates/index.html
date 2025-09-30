@@ -4,6 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QR Code Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -12,68 +15,381 @@
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf1 100%);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 40px 20px;
         }
 
         .container {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            padding: 40px;
-            max-width: 500px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            padding: 56px 48px;
+            max-width: 540px;
             width: 100%;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            max-width: 240px;
+            height: auto;
+            display: inline-block;
+            opacity: 0.9;
         }
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 56px;
         }
 
         .header h1 {
-            color: #333;
-            font-size: 2.5rem;
-            font-weight: 300;
-            margin-bottom: 10px;
+            color: #1a1a1a;
+            font-size: 2rem;
+            font-weight: 400;
+            margin-bottom: 12px;
+            letter-spacing: -0.015em;
         }
 
         .header p {
-            color: #666;
-            font-size: 1.1rem;
+            color: #6b7280;
+            font-size: 1rem;
+            font-weight: 400;
+            line-height: 1.6;
         }
 
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 28px;
         }
 
         label {
             display: block;
             margin-bottom: 8px;
-            color: #333;
-            font-weight: 500;
-            font-size: 1rem;
+            color: #374151;
+            font-weight: 400;
+            font-size: 0.9375rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.005em;
         }
 
-        input[type="text"], input[type="number"], select {
+        input[type="text"], input[type="number"] {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
             border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
+            font-size: 0.9375rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.2s ease;
+            background: #fafafa;
+            line-height: 1.5;
+            color: #1a1a1a;
         }
 
-        input[type="text"]:focus, input[type="number"]:focus, select:focus {
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            padding-right: 44px;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 0.9375rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.2s ease;
+            line-height: 1.5;
+            color: #1a1a1a;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            background: #fafafa url("data:image/svg+xml;charset=UTF-8,%3csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1 1L6 6L11 1' stroke='%239ca3af' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e") no-repeat right 16px center;
+            background-size: 12px 7px;
+            cursor: pointer;
+        }
+
+        input[type="text"]:focus, input[type="number"]:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #9ca3af;
             background: white;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.08);
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: #9ca3af;
+            background: white url("data:image/svg+xml;charset=UTF-8,%3csvg width='12' height='7' viewBox='0 0 12 7' fill='none' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M1 1L6 6L11 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3e%3c/svg%3e") no-repeat right 16px center;
+            background-size: 12px 7px;
+            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.08);
+        }
+
+        input[type="number"]:disabled {
+            background: #e9ecef;
+            color: #6c757d;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+
+        /* Color Picker Styles */
+        .color-picker-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 16px;
+            background: #fafafa;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-bottom: 10px;
+        }
+
+        .color-picker-header:hover {
+            background: white;
+            border-color: #d1d5db;
+        }
+
+        .color-preview-small {
+            width: 24px;
+            height: 24px;
+            border-radius: 6px;
+            background: #000000;
+            border: 1px solid #e5e7eb;
+            transition: all 0.2s ease;
+        }
+
+        .collapse-icon {
+            font-size: 1rem;
+            color: #9ca3af;
+            transition: transform 0.3s ease;
+        }
+
+        .collapse-icon.collapsed {
+            transform: rotate(-90deg);
+        }
+
+        .color-picker-container {
+            padding: 20px;
+            background: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+            border-radius: 12px;
+            border: 1px solid #e8e8e8;
+            max-height: 1000px;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            opacity: 1;
+            box-sizing: border-box;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            backdrop-filter: blur(10px);
+        }
+
+        .color-picker-container.collapsed {
+            max-height: 0;
+            opacity: 0;
+            padding: 0 20px;
+            border: none;
+            box-shadow: none;
+        }
+
+        /* Elegant Color Preview Section */
+        .color-main-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .color-large-preview {
+            width: 48px;
+            min-width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #000000;
+            border: 2px solid #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
+            position: relative;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+
+        .color-large-preview:hover {
+            border-color: #ffffff;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 0, 0, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .color-wheel-ios {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: none;
+            cursor: pointer;
+            opacity: 0;
+        }
+
+        .hex-display {
+            flex: 1;
+        }
+
+        .hex-input-ios {
+            width: 100%;
+            padding: 8px 12px;
+            background: #f8f9fa;
+            border: 1px solid #e8e9ea;
+            border-radius: 8px;
+            font-size: 0.8125rem;
+            font-weight: 400;
+            text-align: center;
+            text-transform: uppercase;
+            font-family: 'Plus Jakarta Sans', monospace;
+            letter-spacing: 0.05em;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            color: #1a1a1a;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .hex-input-ios:focus {
+            outline: none;
+            border-color: #9ca3af;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        /* Elegant RGB Sliders */
+        .rgb-sliders-ios {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            padding: 16px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #f0f0f0;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03);
+        }
+
+        .rgb-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .rgb-label {
+            width: 20px;
+            min-width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 5px;
+            font-weight: 400;
+            font-size: 0.6875rem;
+            color: white;
+            flex-shrink: 0;
+            opacity: 0.92;
+        }
+
+        .rgb-red {
+            background: #ef4444;
+        }
+
+        .rgb-green {
+            background: #22c55e;
+        }
+
+        .rgb-blue {
+            background: #3b82f6;
+        }
+
+        .rgb-value-ios {
+            flex: 1;
+            padding: 6px 5px;
+            background: #f8f9fa;
+            border: 1px solid #e8e9ea;
+            border-radius: 6px;
+            text-align: center;
+            font-size: 0.75rem;
+            font-weight: 400;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-sizing: border-box;
+            min-width: 0;
+            color: #1a1a1a;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
+        }
+
+        .rgb-value-ios:focus {
+            outline: none;
+            border-color: #9ca3af;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(156, 163, 175, 0.12), 0 4px 8px rgba(0, 0, 0, 0.06);
+            transform: translateY(-1px);
+        }
+
+        /* Elegant Slider */
+        .slider-ios {
+            -webkit-appearance: none;
+            appearance: none;
+            flex: 2;
+            height: 5px;
+            border-radius: 2.5px;
+            background: #e5e7eb;
+            outline: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .slider-ios::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: grab;
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(0, 0, 0, 0.06);
+        }
+
+        .slider-ios::-webkit-slider-thumb:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-ios::-webkit-slider-thumb:active {
+            cursor: grabbing;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-ios::-moz-range-thumb {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            cursor: grab;
+            border: 1px solid rgba(0, 0, 0, 0.06);
+            transition: all 0.15s ease;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+        }
+
+        .slider-ios::-moz-range-thumb:hover {
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.14), 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .slider-ios::-moz-range-thumb:active {
+            cursor: grabbing;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         }
 
         .size-inputs {
@@ -91,105 +407,109 @@
         .format-option {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
             border-radius: 10px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            background: #f8f9fa;
+            transition: all 0.2s ease;
+            background: #fafafa;
         }
 
         .format-option:hover {
-            border-color: #667eea;
+            border-color: #d1d5db;
             background: white;
         }
 
         .format-option input[type="radio"] {
-            margin-right: 10px;
-            transform: scale(1.2);
+            margin-right: 8px;
+            transform: scale(1.1);
         }
 
         .format-option.selected {
-            border-color: #667eea;
-            background: #667eea;
+            border-color: #1a1a1a;
+            background: #1a1a1a;
             color: white;
         }
 
         .checkbox-group {
             display: flex;
             align-items: center;
-            padding: 15px;
-            border: 2px solid #e1e5e9;
+            padding: 14px 16px;
+            border: 1px solid #e5e7eb;
             border-radius: 10px;
-            background: #f8f9fa;
+            background: #fafafa;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
 
         .checkbox-group:hover {
-            border-color: #667eea;
+            border-color: #d1d5db;
             background: white;
         }
 
         .checkbox-group input[type="checkbox"] {
             margin-right: 10px;
-            transform: scale(1.2);
+            transform: scale(1.1);
         }
 
         .buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-top: 30px;
+            gap: 12px;
+            margin-top: 40px;
         }
 
         button {
-            padding: 15px 25px;
+            padding: 14px 24px;
             border: none;
             border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 0.9375rem;
+            font-weight: 400;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            letter-spacing: -0.005em;
         }
 
         .btn-preview {
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #e1e5e9;
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
         }
 
         .btn-preview:hover {
-            background: #e9ecef;
-            border-color: #667eea;
+            background: #fafafa;
+            border-color: #d1d5db;
         }
 
         .btn-generate {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #1a1a1a;
             color: white;
         }
 
         .btn-generate:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+            background: #374151;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .btn-browse {
-            padding: 15px 20px;
-            background: #f8f9fa;
-            color: #333;
-            border: 2px solid #e1e5e9;
+            padding: 14px 20px;
+            background: white;
+            color: #374151;
+            border: 1px solid #e5e7eb;
             border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 500;
+            font-size: 0.9375rem;
+            font-weight: 400;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             white-space: nowrap;
         }
 
         .btn-browse:hover {
-            background: #e9ecef;
-            border-color: #667eea;
+            background: #fafafa;
+            border-color: #d1d5db;
         }
 
         .preview-section {
@@ -200,12 +520,6 @@
 
         .preview-section.show {
             display: block;
-        }
-
-        .preview-image {
-            max-width: 100%;
-            border-radius: 10px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
         .flash-messages {
@@ -280,8 +594,12 @@
 
         @media (max-width: 600px) {
             .container {
-                padding: 20px;
-                margin: 10px;
+                padding: 32px 24px;
+                margin: 16px;
+            }
+            
+            .logo {
+                max-width: 180px;
             }
             
             .size-inputs, .format-options, .buttons {
@@ -289,7 +607,11 @@
             }
             
             .header h1 {
-                font-size: 2rem;
+                font-size: 1.75rem;
+            }
+            
+            .header p {
+                font-size: 0.9375rem;
             }
         }
     </style>
@@ -303,10 +625,14 @@
     </noscript>
     
     <div class="container">
+        <div class="logo-container">
+            <img src="/static/new-growthwebs-logo.svg" alt="Logo" class="logo">
+        </div>
+        
         <div class="header">
-            <h1>🔗 QR Generator</h1>
+            <h1>QR Generator</h1>
             <p>Create beautiful QR codes in seconds</p>
-            <a href="/files" style="color: #667eea; text-decoration: none; font-size: 0.9rem; margin-top: 10px; display: inline-block;">📁 View Generated Files</a>
+            <a href="/files" style="color: #6b7280; text-decoration: none; font-size: 0.875rem; margin-top: 10px; display: inline-block; font-weight: 400;">View generated files</a>
         </div>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
@@ -326,10 +652,16 @@
             </div>
 
             <div class="form-group">
-                <label>Size</label>
+                <label>Size (QR codes are always square)</label>
                 <div class="size-inputs">
-                    <input type="number" name="width" placeholder="Width" value="512" min="100" max="1000">
-                    <input type="number" name="height" placeholder="Height" value="512" min="100" max="1000">
+                    <div>
+                        <label style="font-size: 0.85rem; margin-bottom: 5px; font-weight: normal; color: #666;">Width</label>
+                        <input type="number" id="width" name="width" placeholder="Width" value="512" min="100" max="1000">
+                    </div>
+                    <div>
+                        <label style="font-size: 0.85rem; margin-bottom: 5px; font-weight: normal; color: #666;">Height</label>
+                        <input type="number" id="height" name="height" placeholder="Height" value="512" min="100" max="1000" disabled>
+                    </div>
                 </div>
             </div>
 
@@ -348,6 +680,48 @@
             </div>
 
             <div class="form-group">
+                <div class="color-picker-header" onclick="toggleColorPicker()">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="qr_color" style="margin: 0; cursor: pointer; font-weight: 400; font-size: 0.9375rem;">QR code colour</label>
+                        <div class="color-preview-small" id="color_preview_small"></div>
+                        <span id="current_color_text" style="font-size: 0.8125rem; color: #9ca3af; font-weight: 400;">#000000</span>
+                    </div>
+                    <span class="collapse-icon collapsed" id="collapse_icon">▼</span>
+                </div>
+                
+                <div class="color-picker-container collapsed" id="color_picker_container">
+                    <!-- Color Preview & Wheel Section -->
+                    <div class="color-main-section">
+                        <div class="color-large-preview" id="color_preview">
+                            <input type="color" id="qr_color" name="qr_color" value="#000000" class="color-wheel-ios">
+                        </div>
+                        <div class="hex-display">
+                            <input type="text" id="hex_input" value="#000000" placeholder="#000000" maxlength="7" class="hex-input-ios">
+                        </div>
+                    </div>
+                    
+                    <!-- RGB Sliders - iOS Style -->
+                    <div class="rgb-sliders-ios">
+                        <div class="rgb-slider-row">
+                            <span class="rgb-label rgb-red">R</span>
+                            <input type="range" id="r_slider" min="0" max="255" value="0" class="slider-ios">
+                            <input type="number" id="r_value" min="0" max="255" value="0" class="rgb-value-ios">
+                        </div>
+                        <div class="rgb-slider-row">
+                            <span class="rgb-label rgb-green">G</span>
+                            <input type="range" id="g_slider" min="0" max="255" value="0" class="slider-ios">
+                            <input type="number" id="g_value" min="0" max="255" value="0" class="rgb-value-ios">
+                        </div>
+                        <div class="rgb-slider-row">
+                            <span class="rgb-label rgb-blue">B</span>
+                            <input type="range" id="b_slider" min="0" max="255" value="0" class="slider-ios">
+                            <input type="number" id="b_value" min="0" max="255" value="0" class="rgb-value-ios">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label class="checkbox-group">
                     <input type="checkbox" name="background">
                     <span>Include white background</span>
@@ -355,7 +729,7 @@
             </div>
 
             <div class="form-group">
-                <label for="download_location">Download Location</label>
+                <label for="download_location">Download location</label>
                 <select id="download_location" name="download_location">
                     <option value="browser">Download to browser (default)</option>
                     <option value="server">Save to server folder</option>
@@ -363,7 +737,7 @@
             </div>
 
             <div class="form-group" id="server_path_group" style="display: none;">
-                <label for="server_path">Choose Download Location</label>
+                <label for="server_path">Choose download location</label>
                 <div style="display: flex; gap: 10px; align-items: center;">
                     <input type="text" id="server_path" name="server_path" placeholder="Click 'Browse' to choose folder" readonly style="flex: 1;">
                     <button type="button" id="browse_folder" class="btn-browse">Browse</button>
@@ -376,7 +750,7 @@
 
             <div class="buttons">
                 <button type="button" class="btn-preview" onclick="previewQR()">Preview</button>
-                <button type="submit" class="btn-generate" id="generateBtn">Generate & Download</button>
+                <button type="submit" class="btn-generate" id="generateBtn">Generate & download</button>
             </div>
         </form>
 
@@ -606,9 +980,9 @@
         document.getElementById('download_location').addEventListener('change', function() {
             const generateBtn = document.getElementById('generateBtn');
             if (this.value === 'server') {
-                generateBtn.textContent = 'Generate & Save to Server';
+                generateBtn.textContent = 'Generate & save to server';
             } else {
-                generateBtn.textContent = 'Generate & Download';
+                generateBtn.textContent = 'Generate & download';
             }
         });
 
@@ -754,6 +1128,135 @@
             }
         }
         
+        // Sync width to height to keep QR code square
+        function syncDimensions() {
+            const widthInput = document.getElementById('width');
+            const heightInput = document.getElementById('height');
+            
+            // Only sync from width to height (height is disabled)
+            widthInput.addEventListener('input', function() {
+                heightInput.value = this.value;
+            });
+        }
+        
+        // Toggle color picker collapse/expand
+        function toggleColorPicker() {
+            const container = document.getElementById('color_picker_container');
+            const icon = document.getElementById('collapse_icon');
+            
+            container.classList.toggle('collapsed');
+            icon.classList.toggle('collapsed');
+        }
+        
+        // Comprehensive color picker sync (RGB, HEX, Color Wheel)
+        function syncColorPicker() {
+            const colorWheel = document.getElementById('qr_color');
+            const hexInput = document.getElementById('hex_input');
+            const colorPreview = document.getElementById('color_preview');
+            const rSlider = document.getElementById('r_slider');
+            const gSlider = document.getElementById('g_slider');
+            const bSlider = document.getElementById('b_slider');
+            const rValue = document.getElementById('r_value');
+            const gValue = document.getElementById('g_value');
+            const bValue = document.getElementById('b_value');
+            
+            // Convert HEX to RGB
+            function hexToRgb(hex) {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            }
+            
+            // Convert RGB to HEX
+            function rgbToHex(r, g, b) {
+                return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1).toUpperCase();
+            }
+            
+            // Update all inputs from RGB values
+            function updateFromRGB(r, g, b) {
+                const hex = rgbToHex(r, g, b);
+                hexInput.value = hex;
+                colorWheel.value = hex;
+                colorPreview.style.background = hex;
+                rSlider.value = r;
+                gSlider.value = g;
+                bSlider.value = b;
+                rValue.value = r;
+                gValue.value = g;
+                bValue.value = b;
+                
+                // Update iOS slider backgrounds with smooth gradients
+                rSlider.style.background = `linear-gradient(to right, 
+                    rgb(0, ${g}, ${b}), 
+                    rgb(255, ${g}, ${b}))`;
+                gSlider.style.background = `linear-gradient(to right, 
+                    rgb(${r}, 0, ${b}), 
+                    rgb(${r}, 255, ${b}))`;
+                bSlider.style.background = `linear-gradient(to right, 
+                    rgb(${r}, ${g}, 0), 
+                    rgb(${r}, ${g}, 255))`;
+                
+                // Update small preview and text in header
+                const smallPreview = document.getElementById('color_preview_small');
+                const colorText = document.getElementById('current_color_text');
+                if (smallPreview) smallPreview.style.background = hex;
+                if (colorText) colorText.textContent = hex;
+            }
+            
+            // Update from color wheel
+            colorWheel.addEventListener('input', function() {
+                const rgb = hexToRgb(this.value);
+                if (rgb) {
+                    updateFromRGB(rgb.r, rgb.g, rgb.b);
+                }
+            });
+            
+            // Update from HEX input
+            hexInput.addEventListener('input', function() {
+                let hex = this.value;
+                if (!hex.startsWith('#')) hex = '#' + hex;
+                if (/^#[0-9A-F]{6}$/i.test(hex)) {
+                    const rgb = hexToRgb(hex);
+                    if (rgb) {
+                        updateFromRGB(rgb.r, rgb.g, rgb.b);
+                    }
+                }
+            });
+            
+            // Update from RGB sliders
+            [rSlider, gSlider, bSlider].forEach(slider => {
+                slider.addEventListener('input', function() {
+                    const r = parseInt(rSlider.value);
+                    const g = parseInt(gSlider.value);
+                    const b = parseInt(bSlider.value);
+                    updateFromRGB(r, g, b);
+                });
+            });
+            
+            // Update from RGB number inputs
+            [rValue, gValue, bValue].forEach((input, index) => {
+                input.addEventListener('input', function() {
+                    const value = Math.max(0, Math.min(255, parseInt(this.value) || 0));
+                    this.value = value;
+                    
+                    if (index === 0) rSlider.value = value;
+                    else if (index === 1) gSlider.value = value;
+                    else bSlider.value = value;
+                    
+                    const r = parseInt(rSlider.value);
+                    const g = parseInt(gSlider.value);
+                    const b = parseInt(bSlider.value);
+                    updateFromRGB(r, g, b);
+                });
+            });
+            
+            // Initialize with default black color
+            updateFromRGB(0, 0, 0);
+        }
+        
         // Initialize the application
         document.addEventListener('DOMContentLoaded', function() {
             // Show browser compatibility warnings if needed
@@ -764,6 +1267,12 @@
             
             // Log browser info for debugging
             console.log('Browser compatibility:', browser);
+            
+            // Sync width and height fields
+            syncDimensions();
+            
+            // Sync color picker with text display
+            syncColorPicker();
             
             // Add keyboard shortcuts
             document.addEventListener('keydown', function(e) {

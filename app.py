@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, send_file, flash, redirect, url_for
 import os
 import tempfile
+import time
 from qr_generator import generate_qr_code
 import uuid
 
@@ -23,6 +24,7 @@ def generate():
         size = request.form.get('size', '512x512').strip()
         format_type = request.form.get('format', 'png').strip()
         has_background = request.form.get('background') == 'on'
+        qr_color = request.form.get('qr_color', '#000000').strip().lstrip('#')
         download_location = request.form.get('download_location', 'browser')
         server_path = request.form.get('server_path', './downloads').strip()
         
@@ -53,7 +55,8 @@ def generate():
             size=size,
             format_type=format_type,
             output_folder=output_folder,
-            has_background=has_background
+            has_background=has_background,
+            qr_color=qr_color
         )
         
         # The generate_qr_code function now returns a file with a meaningful name
@@ -80,6 +83,7 @@ def preview():
         size = request.form.get('size', '512x512').strip()
         format_type = request.form.get('format', 'png').strip()
         has_background = request.form.get('background') == 'on'
+        qr_color = request.form.get('qr_color', '#000000').strip().lstrip('#')
         
         # Validate URL
         if not url:
@@ -96,7 +100,8 @@ def preview():
             size=size,
             format_type=format_type,
             output_folder=UPLOAD_FOLDER,
-            has_background=has_background
+            has_background=has_background,
+            qr_color=qr_color
         )
         
         # For preview, we'll use the generated file directly
@@ -105,10 +110,11 @@ def preview():
         # Get just the filename from the full path
         temp_filename = os.path.basename(temp_filepath)
         
-        # Return preview data
+        # Return preview data with cache-busting timestamp
+        timestamp = int(time.time() * 1000)  # milliseconds
         return {
             'success': True,
-            'preview_url': f'/static/qr_codes/{temp_filename}',
+            'preview_url': f'/static/qr_codes/{temp_filename}?t={timestamp}',
             'filename': temp_filename
         }
         

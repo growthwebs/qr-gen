@@ -111,7 +111,7 @@ def validate_format(format_input):
     
     return format_lower
 
-def generate_qr_code(url, size="512x512", format_type="png", output_folder="./qr-codes", has_background=True):
+def generate_qr_code(url, size="512x512", format_type="png", output_folder="./qr-codes", has_background=True, qr_color="000000"):
     """
     Generate a QR code for the given URL
     
@@ -121,6 +121,7 @@ def generate_qr_code(url, size="512x512", format_type="png", output_folder="./qr
         format_type (str): Output format (png, svg, eps, pdf)
         output_folder (str): Directory to save the QR code
         has_background (bool): Whether to include white background
+        qr_color (str): QR code color in hex format without # (default: 000000 - black)
     
     Returns:
         str: Path to the generated QR code file
@@ -146,13 +147,16 @@ def generate_qr_code(url, size="512x512", format_type="png", output_folder="./qr
             'format': validated_format
         }
         
-        # Add background color parameter
+        # Add background and QR code color parameters
+        # Remove # from color if present
+        clean_color = qr_color.lstrip('#')
+        
         if has_background:
             qr_params['bgcolor'] = 'FFFFFF'
-            qr_params['color'] = '000000'
+            qr_params['color'] = clean_color
         else:
             qr_params['bgcolor'] = 'transparent'
-            qr_params['color'] = '000000'
+            qr_params['color'] = clean_color
         
         # URL-encode data and build request URL
         encoded_data = quote(url)
