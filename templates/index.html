@@ -38,11 +38,24 @@
             margin-bottom: 40px;
         }
 
+        .logo-container a {
+            display: inline-block;
+            transition: all 0.2s ease;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .logo-container a:hover {
+            opacity: 0.8;
+            transform: translateY(-1px);
+        }
+
         .logo {
             max-width: 240px;
             height: auto;
             display: inline-block;
             opacity: 0.9;
+            transition: all 0.2s ease;
         }
 
         .header {
@@ -626,7 +639,9 @@
     
     <div class="container">
         <div class="logo-container">
-            <img src="/static/new-growthwebs-logo.svg" alt="Logo" class="logo">
+            <a href="https://growthwebs.com" target="_blank" rel="noopener noreferrer">
+                <img src="/static/new-growthwebs-logo.svg" alt="Logo" class="logo">
+            </a>
         </div>
         
         <div class="header">
