@@ -197,24 +197,6 @@ def serve_temp_qr(filename):
     except Exception as e:
         return f"Error serving file: {str(e)}", 500
 
-@app.route('/static/<path:filename>')
-def serve_static(filename):
-    """Serve static files for Vercel"""
-    try:
-        if os.environ.get('VERCEL'):
-            # On Vercel, static files are served from the root static folder
-            static_folder = 'static'
-        else:
-            # Local development
-            static_folder = 'static'
-            
-        filepath = os.path.join(static_folder, filename)
-        if os.path.exists(filepath):
-            return send_file(filepath)
-        else:
-            return "File not found", 404
-    except Exception as e:
-        return f"Error serving static file: {str(e)}", 500
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5001)
