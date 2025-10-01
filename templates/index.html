@@ -1157,8 +1157,8 @@
             <div class="form-group">
                 <label for="download_location">Download location</label>
                 <select id="download_location" name="download_location">
-                    <option value="browser">Download to browser (default)</option>
-                    <option value="server">Save to server folder</option>
+                    <option value="browser">Save to Downloads folder</option>
+                    <option value="server">Save as...</option>
                 </select>
             </div>
 
@@ -1410,7 +1410,7 @@
         document.getElementById('download_location').addEventListener('change', function() {
             const generateBtn = document.getElementById('generateBtn');
             if (this.value === 'server') {
-                generateBtn.textContent = 'Generate & save to server';
+                generateBtn.textContent = 'Generate & save as...';
             } else {
                 generateBtn.textContent = 'Generate & download';
             }
