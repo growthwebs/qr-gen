@@ -12,6 +12,10 @@
   ],
   "routes": [
     {
+      "src": "/tmp/qr_codes/(.*)",
+      "dest": "app.py"
+    },
+    {
       "src": "/(.*\\.(svg|png|jpg|jpeg|gif|ico|css|js))",
       "dest": "/public/$1"
     },

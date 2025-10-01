@@ -95,12 +95,12 @@ def preview():
             url = 'https://' + url
         
         # Generate preview QR code with meaningful name
-        # Always use static folder for preview files
+        # Use /tmp for Vercel (read-only file system)
         generated_file = generate_qr_code(
             url=url,
             size=size,
             format_type=format_type,
-            output_folder='static/qr_codes',
+            output_folder=UPLOAD_FOLDER,
             has_background=has_background,
             qr_color=qr_color
         )
@@ -114,8 +114,11 @@ def preview():
         # Return preview data with cache-busting timestamp
         timestamp = int(time.time() * 1000)  # milliseconds
         
-        # Always use static file serving for preview
-        preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
+        # For Vercel, serve from /tmp with proper route
+        if os.environ.get('VERCEL'):
+            preview_url = f'/tmp/qr_codes/{temp_filename}?t={timestamp}'
+        else:
+            preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
             
         return jsonify({
             'success': True,
