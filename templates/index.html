@@ -1236,12 +1236,106 @@
             }
         }
         
-        // Enhanced preview function with browser compatibility
+        // Human-friendly validation functions
+        function validateURL(url) {
+            if (!url || url.trim() === '') {
+                return {
+                    isValid: false,
+                    message: 'Please enter a website address to create a QR code',
+                    suggestion: 'Try entering something like: https://example.com'
+                };
+            }
+            
+            const trimmedUrl = url.trim();
+            
+            // Check for basic URL patterns
+            const urlPattern = /^(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w \.-]*)*\/?$/i;
+            const simplePattern = /^[a-zA-Z0-9][a-zA-Z0-9-]{1,61}[a-zA-Z0-9]\.[a-zA-Z]{2,}$/;
+            
+            if (!urlPattern.test(trimmedUrl) && !simplePattern.test(trimmedUrl)) {
+                return {
+                    isValid: false,
+                    message: 'That doesn\'t look like a valid website address',
+                    suggestion: 'Make sure to include the full address like: https://example.com'
+                };
+            }
+            
+            // Add https:// if missing
+            if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+                return {
+                    isValid: true,
+                    url: 'https://' + trimmedUrl,
+                    message: 'Added "https://" to your address'
+                };
+            }
+            
+            return {
+                isValid: true,
+                url: trimmedUrl
+            };
+        }
+        
+        function showValidationMessage(message, suggestion = null, type = 'error') {
+            // Remove any existing validation messages
+            const existingMessage = document.querySelector('.validation-message');
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+            
+            // Create validation message
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `validation-message validation-${type}`;
+            messageDiv.innerHTML = `
+                <div style="display: flex; align-items: flex-start; gap: 12px; padding: 16px; background: ${type === 'error' ? '#fef2f2' : '#f0f9ff'}; border: 1px solid ${type === 'error' ? '#fecaca' : '#bae6fd'}; border-radius: 12px; margin: 16px 0;">
+                    <div style="flex-shrink: 0; width: 20px; height: 20px; border-radius: 50%; background: ${type === 'error' ? '#ef4444' : '#3b82f6'}; display: flex; align-items: center; justify-content: center; margin-top: 2px;">
+                        <span style="color: white; font-size: 12px; font-weight: bold;">${type === 'error' ? '!' : 'i'}</span>
+                    </div>
+                    <div style="flex: 1;">
+                        <p style="margin: 0 0 8px 0; color: ${type === 'error' ? '#dc2626' : '#1e40af'}; font-weight: 500; font-size: 0.875rem;">${message}</p>
+                        ${suggestion ? `<p style="margin: 0; color: ${type === 'error' ? '#7f1d1d' : '#1e3a8a'}; font-size: 0.8125rem; opacity: 0.8;">${suggestion}</p>` : ''}
+                    </div>
+                </div>
+            `;
+            
+            // Insert after the URL input field
+            const urlField = document.getElementById('url');
+            urlField.parentNode.insertBefore(messageDiv, urlField.parentNode.nextSibling);
+            
+            // Scroll to the message
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            
+            // Auto-hide after 5 seconds for info messages
+            if (type === 'info') {
+                setTimeout(() => {
+                    if (messageDiv.parentNode) {
+                        messageDiv.remove();
+                    }
+                }, 5000);
+            }
+        }
+        
+        // Enhanced preview function with human-friendly validation
         function previewQR() {
             // Check browser compatibility first
             if (!browser.supportsFetch) {
                 showMessage('Preview not supported in your browser. Please use "Generate & Download" instead.', 'error');
                 return;
+            }
+            
+            // Validate URL first
+            const urlInput = document.getElementById('url');
+            const urlValue = urlInput.value.trim();
+            const validation = validateURL(urlValue);
+            
+            if (!validation.isValid) {
+                showValidationMessage(validation.message, validation.suggestion, 'error');
+                urlInput.focus();
+                return;
+            }
+            
+            // Show info message if URL was modified
+            if (validation.message) {
+                showValidationMessage(validation.message, null, 'info');
             }
             
             // Disable preview button during request
@@ -1418,6 +1512,28 @@
 
         // Update size field when form is submitted
         document.getElementById('qrForm').addEventListener('submit', async function(e) {
+            // Validate URL first
+            const urlInput = document.getElementById('url');
+            const urlValue = urlInput.value.trim();
+            const validation = validateURL(urlValue);
+            
+            if (!validation.isValid) {
+                e.preventDefault(); // Prevent form submission
+                showValidationMessage(validation.message, validation.suggestion, 'error');
+                urlInput.focus();
+                return;
+            }
+            
+            // Update URL field with corrected URL if needed
+            if (validation.url && validation.url !== urlValue) {
+                urlInput.value = validation.url;
+            }
+            
+            // Show info message if URL was modified
+            if (validation.message) {
+                showValidationMessage(validation.message, null, 'info');
+            }
+            
             const width = document.querySelector('input[name="width"]').value || '512';
             const height = document.querySelector('input[name="height"]').value || '512';
             
@@ -1721,13 +1837,38 @@
             
             // Add form validation
             const urlInput = document.getElementById('url');
+            // Real-time URL validation with visual feedback
             urlInput.addEventListener('input', function() {
                 const url = this.value.trim();
-                if (url && !url.match(/^https?:\/\//)) {
-                    this.style.borderColor = '#ffc107';
-                } else {
-                    this.style.borderColor = '#e1e5e9';
+                
+                // Remove any existing validation messages
+                const existingMessage = document.querySelector('.validation-message');
+                if (existingMessage) {
+                    existingMessage.remove();
                 }
+                
+                if (url === '') {
+                    this.style.borderColor = '#e1e5e9';
+                    return;
+                }
+                
+                const validation = validateURL(url);
+                
+                if (validation.isValid) {
+                    this.style.borderColor = '#10b981'; // Green for valid
+                    if (validation.message) {
+                        showValidationMessage(validation.message, null, 'info');
+                    }
+                } else {
+                    this.style.borderColor = '#ef4444'; // Red for invalid
+                }
+            });
+            
+            // Clear validation styling when field loses focus
+            urlInput.addEventListener('blur', function() {
+                setTimeout(() => {
+                    this.style.borderColor = '#e1e5e9';
+                }, 100);
             });
         });
     </script>
