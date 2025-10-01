@@ -95,11 +95,12 @@ def preview():
             url = 'https://' + url
         
         # Generate preview QR code with meaningful name
+        # Always use static folder for preview files
         generated_file = generate_qr_code(
             url=url,
             size=size,
             format_type=format_type,
-            output_folder=UPLOAD_FOLDER,
+            output_folder='static/qr_codes',
             has_background=has_background,
             qr_color=qr_color
         )
@@ -113,21 +114,8 @@ def preview():
         # Return preview data with cache-busting timestamp
         timestamp = int(time.time() * 1000)  # milliseconds
         
-        # For Vercel, we'll serve the file directly as base64
-        if os.environ.get('VERCEL'):
-            import base64
-            try:
-                with open(temp_filepath, 'rb') as f:
-                    file_data = f.read()
-                    base64_data = base64.b64encode(file_data).decode('utf-8')
-                    preview_url = f'data:image/png;base64,{base64_data}'
-            except Exception as e:
-                return jsonify({
-                    'success': False,
-                    'error': f'Error reading preview file: {str(e)}'
-                })
-        else:
-            preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
+        # Always use static file serving for preview
+        preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
             
         return jsonify({
             'success': True,
