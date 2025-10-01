@@ -3,7 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QR Code Generator</title>
+    
+    <!-- SEO Meta Tags -->
+    <title>Free QR Code Generator | Create QR Codes Online - GrowthWebs</title>
+    <meta name="description" content="Create beautiful, custom QR codes for free! Professional QR code generator with color customization, multiple formats (PNG, SVG), and instant download. Perfect for businesses, marketing, and personal use.">
+    <meta name="keywords" content="QR code generator, free QR codes, create QR code online, QR code maker, custom QR codes, business QR codes, marketing QR codes, QR code PNG, QR code SVG, professional QR codes">
+    <meta name="author" content="GrowthWebs">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://qr-gen.growthwebs.com/">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Free QR Code Generator | Create QR Codes Online - GrowthWebs">
+    <meta property="og:description" content="Create beautiful, custom QR codes for free! Professional QR code generator with color customization, multiple formats, and instant download.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://qr-gen.growthwebs.com/">
+    <meta property="og:image" content="https://qr-gen.growthwebs.com/new-growthwebs-logo.svg">
+    <meta property="og:site_name" content="GrowthWebs QR Generator">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Free QR Code Generator | Create QR Codes Online - GrowthWebs">
+    <meta name="twitter:description" content="Create beautiful, custom QR codes for free! Professional QR code generator with color customization, multiple formats, and instant download.">
+    <meta name="twitter:image" content="https://qr-gen.growthwebs.com/new-growthwebs-logo.svg">
+    
+    <!-- Additional SEO Meta Tags -->
+    <meta name="theme-color" content="#667eea">
+    <meta name="msapplication-TileColor" content="#667eea">
+    <meta name="application-name" content="QR Code Generator by GrowthWebs">
+    
+    <!-- Structured Data (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "QR Code Generator",
+        "description": "Free online QR code generator with customization options for businesses and personal use",
+        "url": "https://qr-gen.growthwebs.com/",
+        "applicationCategory": "BusinessApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "creator": {
+            "@type": "Organization",
+            "name": "GrowthWebs",
+            "url": "https://growthwebs.com"
+        },
+        "featureList": [
+            "Free QR code generation",
+            "Custom colors and styling",
+            "Multiple output formats (PNG, SVG)",
+            "Instant download",
+            "Professional quality",
+            "No registration required"
+        ]
+    }
+    </script>
     
     <!-- Favicon - Multiple formats for better browser compatibility -->
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -1063,11 +1120,11 @@
             <img src="/new-growthwebs-logo.svg" alt="GrowthWebs Logo" class="logo">
         </div>
         
-        <div class="header">
-            <h1>QR Generator</h1>
-            <p>Create beautiful QR codes in seconds</p>
+        <header class="header">
+            <h1>Free QR Code Generator | Create Professional QR Codes Online</h1>
+            <p>Generate beautiful, custom QR codes instantly with our free online QR code maker. Perfect for businesses, marketing campaigns, and personal use. No registration required!</p>
             <a href="/files" style="color: #6b7280; text-decoration: none; font-size: 0.875rem; margin-top: 10px; display: inline-block; font-weight: 400;">View generated files</a>
-        </div>
+        </header>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
@@ -1079,11 +1136,21 @@
             {% endif %}
         {% endwith %}
 
-        <form id="qrForm" method="POST" action="/generate">
-            <div class="form-group">
-                <label for="url">Website URL</label>
-                <input type="text" id="url" name="url" placeholder="https://example.com" required>
-            </div>
+        <main>
+            <section class="qr-generator-section">
+                <h2>How to Create QR Codes - Simple 3-Step Process</h2>
+                <ol style="color: #6b7280; font-size: 0.875rem; margin-bottom: 30px; padding-left: 20px;">
+                    <li>Enter your website URL or text</li>
+                    <li>Customize colors and size</li>
+                    <li>Download your professional QR code instantly</li>
+                </ol>
+                
+                <form id="qrForm" method="POST" action="/generate" aria-label="QR Code Generator Form">
+                    <div class="form-group">
+                        <label for="url">Website URL or Text</label>
+                        <input type="text" id="url" name="url" placeholder="https://example.com" required aria-describedby="url-help">
+                        <small id="url-help" style="color: #6b7280; font-size: 0.75rem; margin-top: 5px; display: block;">Enter any website URL, phone number, email, or text to encode</small>
+                    </div>
 
             <div class="form-group">
                 <label>Size (QR codes are always square)</label>
@@ -1182,11 +1249,49 @@
                 </small>
             </div>
 
-            <div class="buttons">
-                <button type="button" class="btn-preview" onclick="previewQR()">Preview</button>
-                <button type="submit" class="btn-generate" id="generateBtn">Generate & download</button>
+                    <div class="buttons">
+                        <button type="button" class="btn-preview" onclick="previewQR()">Preview</button>
+                        <button type="submit" class="btn-generate" id="generateBtn">Generate & download</button>
+                    </div>
+                </form>
+            </section>
+        </main>
+        
+        <!-- SEO Content Section -->
+        <section class="seo-content" style="margin-top: 50px; padding: 30px; background: #f8f9fa; border-radius: 12px; font-size: 0.875rem; line-height: 1.6;">
+            <h2 style="color: #1f2937; margin-bottom: 20px; font-size: 1.25rem;">Why Choose Our QR Code Generator?</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+                <div>
+                    <h3 style="color: #374151; margin-bottom: 10px; font-size: 1rem;">✅ Free & No Registration</h3>
+                    <p style="color: #6b7280;">Create unlimited QR codes completely free. No signup, no hidden fees, no watermarks.</p>
+                </div>
+                <div>
+                    <h3 style="color: #374151; margin-bottom: 10px; font-size: 1rem;">🎨 Custom Colors & Styling</h3>
+                    <p style="color: #6b7280;">Customize your QR codes with brand colors, gradients, and professional styling options.</p>
+                </div>
+                <div>
+                    <h3 style="color: #374151; margin-bottom: 10px; font-size: 1rem;">📱 Multiple Formats</h3>
+                    <p style="color: #6b7280;">Download in PNG, SVG, EPS, or PDF formats for any use case - web, print, or mobile.</p>
+                </div>
+                <div>
+                    <h3 style="color: #374151; margin-bottom: 10px; font-size: 1rem;">⚡ Instant Generation</h3>
+                    <p style="color: #6b7280;">Generate professional QR codes in seconds with our fast, reliable online tool.</p>
+                </div>
             </div>
-        </form>
+            
+            <div style="margin-top: 30px;">
+                <h3 style="color: #374151; margin-bottom: 15px; font-size: 1rem;">Perfect for Businesses & Marketing</h3>
+                <p style="color: #6b7280; margin-bottom: 15px;">Our QR code generator is trusted by businesses worldwide for:</p>
+                <ul style="color: #6b7280; padding-left: 20px;">
+                    <li><strong>Restaurant menus</strong> - Contactless dining experiences</li>
+                    <li><strong>Marketing campaigns</strong> - Link to websites, promotions, social media</li>
+                    <li><strong>Business cards</strong> - Digital contact information</li>
+                    <li><strong>Event tickets</strong> - Easy check-in and validation</li>
+                    <li><strong>Product packaging</strong> - Customer engagement and information</li>
+                    <li><strong>Real estate</strong> - Property details and virtual tours</li>
+                </ul>
+            </div>
+        </section>
 
         <div class="preview-section" id="previewSection">
             <h3>Preview</h3>
@@ -1201,9 +1306,29 @@
             </div>
         </div>
         
-        <div class="footer">
-            <p>Built by <a href="https://growthwebs.com" target="_blank" rel="noopener noreferrer" class="footer-link">growthwebs</a></p>
-        </div>
+        <footer class="footer">
+            <div style="text-align: center; margin-top: 40px; padding: 30px; border-top: 1px solid #e5e7eb;">
+                <p style="margin-bottom: 15px; color: #6b7280;">Built by <a href="https://growthwebs.com" target="_blank" rel="noopener noreferrer" class="footer-link">GrowthWebs</a> - Professional Web Development & Digital Marketing Solutions</p>
+                
+                <div style="margin-top: 20px;">
+                    <h4 style="color: #374151; margin-bottom: 10px; font-size: 0.875rem;">Popular QR Code Use Cases:</h4>
+                    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; font-size: 0.75rem; color: #6b7280;">
+                        <span>• Restaurant Menus</span>
+                        <span>• Business Cards</span>
+                        <span>• Marketing Materials</span>
+                        <span>• Event Tickets</span>
+                        <span>• Product Packaging</span>
+                        <span>• Social Media</span>
+                        <span>• Contact Information</span>
+                        <span>• Website Links</span>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 0.75rem; color: #9ca3af;">
+                    <p>© 2024 GrowthWebs. All rights reserved. | <a href="https://growthwebs.com" style="color: #9ca3af;">Professional Web Development</a> | <a href="https://growthwebs.com/contact" style="color: #9ca3af;">Contact Us</a></p>
+                </div>
+            </div>
+        </footer>
     </div>
 
     <script>
