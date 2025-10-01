@@ -1416,27 +1416,24 @@
                 }
                 
                 const result = await response.json();
+                console.log('Preview response:', result);
                 
                 if (result.success) {
-                    // Create a new image to test loading
-                    const img = new Image();
+                    // Set the preview image source directly
+                    previewImage.src = result.preview_url;
+                    previewImage.style.display = 'block';
+                    if (loadingDiv) loadingDiv.style.display = 'none';
                     
-                    img.onload = function() {
-                        previewImage.src = result.preview_url;
-                        previewImage.style.display = 'block';
-                        if (loadingDiv) loadingDiv.style.display = 'none';
-                        
-                        // Add success message
-                        showMessage('Preview generated successfully!', 'success');
-                    };
+                    console.log('Preview image set to:', result.preview_url.substring(0, 50) + '...');
                     
-                    img.onerror = function() {
-                        if (loadingDiv) loadingDiv.style.display = 'none';
+                    // Add error handler for the preview image
+                    previewImage.onerror = function() {
+                        console.error('Preview image failed to load');
                         showMessage('Preview image failed to load. Please try again.', 'error');
                     };
                     
-                    // Start loading the image
-                    img.src = result.preview_url;
+                    // Add success message
+                    showMessage('Preview generated successfully!', 'success');
                     
                 } else {
                     if (loadingDiv) loadingDiv.style.display = 'none';
