@@ -1355,6 +1355,23 @@
             const form = document.getElementById('qrForm');
             const formData = new FormData(form);
             
+            // Validate and correct URL before sending
+            const urlInput = document.getElementById('url');
+            const urlValue = urlInput.value.trim();
+            const validation = validateURL(urlValue);
+            
+            if (!validation.isValid) {
+                showValidationMessage(validation.message, validation.suggestion, 'error');
+                urlInput.focus();
+                return;
+            }
+            
+            // Update URL field with corrected URL if needed
+            if (validation.url && validation.url !== urlValue) {
+                urlInput.value = validation.url;
+                formData.set('url', validation.url);
+            }
+            
             // Get size values
             const width = document.querySelector('input[name="width"]').value || '512';
             const height = document.querySelector('input[name="height"]').value || '512';

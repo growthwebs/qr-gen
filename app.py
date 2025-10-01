@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, send_file, flash, redirect, url_for
+from flask import Flask, render_template, request, send_file, flash, redirect, url_for, jsonify
 import os
 import tempfile
 import time
@@ -119,17 +119,17 @@ def preview():
         else:
             preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
             
-        return {
+        return jsonify({
             'success': True,
             'preview_url': preview_url,
             'filename': temp_filename
-        }
+        })
         
     except Exception as e:
-        return {
+        return jsonify({
             'success': False,
             'error': str(e)
-        }
+        })
 
 @app.route('/files')
 def list_files():
