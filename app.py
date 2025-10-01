@@ -113,9 +113,19 @@ def preview():
         # Return preview data with cache-busting timestamp
         timestamp = int(time.time() * 1000)  # milliseconds
         
-        # For Vercel, we need to serve from the correct path
+        # For Vercel, we'll serve the file directly as base64
         if os.environ.get('VERCEL'):
-            preview_url = f'/tmp/qr_codes/{temp_filename}?t={timestamp}'
+            import base64
+            try:
+                with open(temp_filepath, 'rb') as f:
+                    file_data = f.read()
+                    base64_data = base64.b64encode(file_data).decode('utf-8')
+                    preview_url = f'data:image/png;base64,{base64_data}'
+            except Exception as e:
+                return jsonify({
+                    'success': False,
+                    'error': f'Error reading preview file: {str(e)}'
+                })
         else:
             preview_url = f'/static/qr_codes/{temp_filename}?t={timestamp}'
             
