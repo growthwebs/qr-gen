@@ -1,0 +1,16 @@
+{
+    "name": "QR Code Generator",
+    "short_name": "QR Generator",
+    "description": "Create beautiful QR codes in seconds",
+    "icons": [
+        {
+            "src": "/new-favicon-growthwebs.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "theme_color": "#667eea",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "start_url": "/"
+}
