@@ -1384,8 +1384,18 @@
             }
         }
         
+        // Global state to prevent multiple simultaneous requests
+        let isGenerating = false;
+        let isPreviewing = false;
+        
         // Enhanced preview function with human-friendly validation
         function previewQR() {
+            // Prevent multiple simultaneous requests
+            if (isPreviewing) {
+                console.log('Preview already in progress, ignoring request');
+                return;
+            }
+            
             // Check browser compatibility first
             if (!browser.supportsFetch) {
                 showMessage('Preview not supported in your browser. Please use "Generate & Download" instead.', 'error');
@@ -1413,10 +1423,14 @@
             previewBtn.disabled = true;
             previewBtn.textContent = 'Generating...';
             
+            // Set previewing state
+            isPreviewing = true;
+            
             // Call the async preview function
             previewQRAsync().finally(() => {
                 previewBtn.disabled = false;
                 previewBtn.textContent = 'Preview';
+                isPreviewing = false;
             });
         }
         
@@ -1596,6 +1610,14 @@
 
         // Update size field when form is submitted
         document.getElementById('qrForm').addEventListener('submit', async function(e) {
+            // Prevent multiple simultaneous requests
+            if (isGenerating) {
+                e.preventDefault();
+                console.log('Generation already in progress, ignoring request');
+                showMessage('Please wait for the current generation to complete.', 'error');
+                return;
+            }
+            
             // Validate URL first
             const urlInput = document.getElementById('url');
             const urlValue = urlInput.value.trim();
@@ -1618,28 +1640,52 @@
                 showValidationMessage(validation.message, null, 'info');
             }
             
-            const width = document.querySelector('input[name="width"]').value || '512';
-            const height = document.querySelector('input[name="height"]').value || '512';
+            // Set generating state
+            isGenerating = true;
             
-            // Create hidden input for size
-            const sizeInput = document.createElement('input');
-            sizeInput.type = 'hidden';
-            sizeInput.name = 'size';
-            sizeInput.value = `${width}x${height}`;
-            this.appendChild(sizeInput);
-
-            // Handle file picker selection for server storage
-            const downloadLocation = document.getElementById('download_location').value;
-            if (downloadLocation === 'server') {
-                const pathInput = document.getElementById('server_path');
-                const hasDirectoryHandle = pathInput.dataset.handle === 'selected';
+            // Disable generate button during processing
+            const generateBtn = document.getElementById('generateBtn');
+            const originalText = generateBtn.textContent;
+            generateBtn.disabled = true;
+            generateBtn.textContent = 'Generating...';
+            
+            try {
+                const width = document.querySelector('input[name="width"]').value || '512';
+                const height = document.querySelector('input[name="height"]').value || '512';
                 
-                if (hasDirectoryHandle) {
-                    // If a directory was selected via file picker, we'll handle it differently
-                    e.preventDefault();
-                    await handleFilePickerGeneration();
-                    return;
+                // Create hidden input for size
+                const sizeInput = document.createElement('input');
+                sizeInput.type = 'hidden';
+                sizeInput.name = 'size';
+                sizeInput.value = `${width}x${height}`;
+                this.appendChild(sizeInput);
+
+                // Handle file picker selection for server storage
+                const downloadLocation = document.getElementById('download_location').value;
+                if (downloadLocation === 'server') {
+                    const pathInput = document.getElementById('server_path');
+                    const hasDirectoryHandle = pathInput.dataset.handle === 'selected';
+                    
+                    if (hasDirectoryHandle) {
+                        // If a directory was selected via file picker, we'll handle it differently
+                        e.preventDefault();
+                        await handleFilePickerGeneration();
+                        return;
+                    }
                 }
+                
+                // Allow normal form submission for browser download
+                // The form will submit normally and redirect to download
+                
+            } catch (error) {
+                console.error('Error during form submission:', error);
+                showMessage('Error processing request. Please try again.', 'error');
+                e.preventDefault();
+            } finally {
+                // Reset button state
+                generateBtn.disabled = false;
+                generateBtn.textContent = originalText;
+                isGenerating = false;
             }
         });
 
@@ -1790,6 +1836,9 @@
             const gValue = document.getElementById('g_value');
             const bValue = document.getElementById('b_value');
             
+            // Flag to prevent infinite loops during updates
+            let isUpdating = false;
+            
             // Convert HEX to RGB
             function hexToRgb(hex) {
                 const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -1807,6 +1856,9 @@
             
             // Update all inputs from RGB values
             function updateFromRGB(r, g, b) {
+                if (isUpdating) return; // Prevent infinite loops
+                isUpdating = true;
+                
                 const hex = rgbToHex(r, g, b);
                 hexInput.value = hex;
                 colorWheel.value = hex;
@@ -1834,10 +1886,13 @@
                 const colorText = document.getElementById('current_color_text');
                 if (smallPreview) smallPreview.style.background = hex;
                 if (colorText) colorText.textContent = hex;
+                
+                isUpdating = false;
             }
             
             // Update from color wheel
             colorWheel.addEventListener('input', function() {
+                if (isUpdating) return;
                 const rgb = hexToRgb(this.value);
                 if (rgb) {
                     updateFromRGB(rgb.r, rgb.g, rgb.b);
@@ -1846,6 +1901,7 @@
             
             // Update from HEX input
             hexInput.addEventListener('input', function() {
+                if (isUpdating) return;
                 let hex = this.value;
                 if (!hex.startsWith('#')) hex = '#' + hex;
                 if (/^#[0-9A-F]{6}$/i.test(hex)) {
@@ -1859,6 +1915,7 @@
             // Update from RGB sliders
             [rSlider, gSlider, bSlider].forEach(slider => {
                 slider.addEventListener('input', function() {
+                    if (isUpdating) return;
                     const r = parseInt(rSlider.value);
                     const g = parseInt(gSlider.value);
                     const b = parseInt(bSlider.value);
@@ -1869,6 +1926,7 @@
             // Update from RGB number inputs
             [rValue, gValue, bValue].forEach((input, index) => {
                 input.addEventListener('input', function() {
+                    if (isUpdating) return;
                     const value = Math.max(0, Math.min(255, parseInt(this.value) || 0));
                     this.value = value;
                     
@@ -1904,55 +1962,85 @@
             // Sync color picker with text display
             syncColorPicker();
             
-            // Add keyboard shortcuts
-            document.addEventListener('keydown', function(e) {
+            // Add keyboard shortcuts with cleanup
+            const keyboardHandler = function(e) {
                 // Ctrl/Cmd + Enter to generate
                 if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
                     e.preventDefault();
-                    document.getElementById('generateBtn').click();
+                    const generateBtn = document.getElementById('generateBtn');
+                    if (generateBtn && !generateBtn.disabled) {
+                        generateBtn.click();
+                    }
                 }
                 
                 // Ctrl/Cmd + P to preview
                 if ((e.ctrlKey || e.metaKey) && e.key === 'p') {
                     e.preventDefault();
-                    document.querySelector('.btn-preview').click();
-                }
-            });
-            
-            // Add form validation
-            const urlInput = document.getElementById('url');
-            // Real-time URL validation with visual feedback
-            urlInput.addEventListener('input', function() {
-                const url = this.value.trim();
-                
-                // Remove any existing validation messages
-                const existingMessage = document.querySelector('.validation-message');
-                if (existingMessage) {
-                    existingMessage.remove();
-                }
-                
-                if (url === '') {
-                    this.style.borderColor = '#e1e5e9';
-                    return;
-                }
-                
-                const validation = validateURL(url);
-                
-                if (validation.isValid) {
-                    this.style.borderColor = '#10b981'; // Green for valid
-                    if (validation.message) {
-                        showValidationMessage(validation.message, null, 'info');
+                    const previewBtn = document.querySelector('.btn-preview');
+                    if (previewBtn && !previewBtn.disabled) {
+                        previewBtn.click();
                     }
-                } else {
-                    this.style.borderColor = '#ef4444'; // Red for invalid
                 }
-            });
+            };
+            document.addEventListener('keydown', keyboardHandler);
             
-            // Clear validation styling when field loses focus
-            urlInput.addEventListener('blur', function() {
-                setTimeout(() => {
-                    this.style.borderColor = '#e1e5e9';
-                }, 100);
+            // Add form validation with cleanup
+            const urlInput = document.getElementById('url');
+            if (urlInput) {
+                // Real-time URL validation with visual feedback
+                const inputHandler = function() {
+                    const url = this.value.trim();
+                    
+                    // Remove any existing validation messages
+                    const existingMessage = document.querySelector('.validation-message');
+                    if (existingMessage) {
+                        existingMessage.remove();
+                    }
+                    
+                    if (url === '') {
+                        this.style.borderColor = '#e1e5e9';
+                        return;
+                    }
+                    
+                    const validation = validateURL(url);
+                    
+                    if (validation.isValid) {
+                        this.style.borderColor = '#10b981'; // Green for valid
+                        if (validation.message) {
+                            showValidationMessage(validation.message, null, 'info');
+                        }
+                    } else {
+                        this.style.borderColor = '#ef4444'; // Red for invalid
+                    }
+                };
+                
+                // Clear validation styling when field loses focus
+                const blurHandler = function() {
+                    setTimeout(() => {
+                        this.style.borderColor = '#e1e5e9';
+                    }, 100);
+                };
+                
+                urlInput.addEventListener('input', inputHandler);
+                urlInput.addEventListener('blur', blurHandler);
+                
+                // Store handlers for potential cleanup
+                urlInput._inputHandler = inputHandler;
+                urlInput._blurHandler = blurHandler;
+            }
+            
+            // Add cleanup on page unload
+            window.addEventListener('beforeunload', function() {
+                // Clean up event listeners
+                document.removeEventListener('keydown', keyboardHandler);
+                if (urlInput && urlInput._inputHandler) {
+                    urlInput.removeEventListener('input', urlInput._inputHandler);
+                    urlInput.removeEventListener('blur', urlInput._blurHandler);
+                }
+                
+                // Reset global states
+                isGenerating = false;
+                isPreviewing = false;
             });
         });
     </script>
