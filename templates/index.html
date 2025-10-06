@@ -1139,10 +1139,16 @@
         <main>
             <section class="qr-generator-section">
                 <form id="qrForm" method="POST" action="/generate" aria-label="QR Code Generator Form">
-            <div class="form-group">
-                <label for="url">Website URL</label>
-                <input type="text" id="url" name="url" placeholder="https://example.com" required>
-            </div>
+                    <div class="form-group">
+                        <label for="url">Website URL</label>
+                        <input type="text" id="url" name="url" placeholder="https://example.com" required>
+                        <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+                            <button type="button" class="quick-url-btn" data-url="https://growthwebs.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">GrowthWebs</button>
+                            <button type="button" class="quick-url-btn" data-url="https://instagram.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">Instagram</button>
+                            <button type="button" class="quick-url-btn" data-url="https://facebook.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">Facebook</button>
+                            <button type="button" class="quick-url-btn" data-url="https://youtube.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">YouTube</button>
+                        </div>
+                    </div>
 
             <div class="form-group">
                 <label>Size (QR codes are always square)</label>
@@ -1260,6 +1266,24 @@
             <div id="previewFallback" style="display: none; text-align: center; padding: 20px; background: #f8f9fa; border-radius: 10px; margin-top: 10px;">
                 <p style="color: #666; margin-bottom: 10px;">Preview not available in your browser.</p>
                 <p style="color: #999; font-size: 0.9rem;">You can still generate and download QR codes using the "Generate & Download" button.</p>
+            </div>
+            
+            <!-- Success state with quick actions -->
+            <div id="successActions" style="display: none; text-align: center; margin-top: 20px; padding: 20px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 12px;">
+                <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px;">
+                    <div style="width: 20px; height: 20px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <span style="color: white; font-size: 12px; font-weight: bold;">✓</span>
+                    </div>
+                    <h4 style="margin: 0; color: #1e40af; font-size: 1rem;">QR Code Generated Successfully!</h4>
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
+                    <button id="generateAnotherBtn" class="btn btn-secondary" style="background: #6b7280; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: background 0.2s;">
+                        Generate Another
+                    </button>
+                    <button id="copyUrlBtn" class="btn btn-secondary" style="background: #3b82f6; color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 0.875rem; cursor: pointer; transition: background 0.2s;">
+                        Copy URL
+                    </button>
+                </div>
             </div>
         </div>
         
@@ -1516,8 +1540,8 @@
                         showMessage('Preview image failed to load. Please try again.', 'error');
                     };
                     
-                    // Add success message
-                    showMessage('Preview generated successfully!', 'success');
+                    // Show success actions
+                    showSuccessActions();
                     
                 } else {
                     if (loadingDiv) loadingDiv.style.display = 'none';
@@ -1584,6 +1608,101 @@
                     messageDiv.remove();
                 }
             }, 5000);
+        }
+        
+        // Show success actions after QR generation
+        function showSuccessActions() {
+            const successActions = document.getElementById('successActions');
+            if (successActions) {
+                successActions.style.display = 'block';
+                
+                // Scroll to success actions
+                successActions.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }
+        }
+        
+        // Hide success actions
+        function hideSuccessActions() {
+            const successActions = document.getElementById('successActions');
+            if (successActions) {
+                successActions.style.display = 'none';
+            }
+        }
+        
+        // Reset form for new QR generation
+        function resetFormForNewQR() {
+            // Clear URL input
+            const urlInput = document.getElementById('url');
+            if (urlInput) {
+                urlInput.value = '';
+                urlInput.style.borderColor = '#e1e5e9';
+            }
+            
+            // Reset to default size
+            const widthInput = document.querySelector('input[name="width"]');
+            const heightInput = document.querySelector('input[name="height"]');
+            if (widthInput && heightInput) {
+                widthInput.value = '512';
+                heightInput.value = '512';
+            }
+            
+            // Reset color to black
+            const colorWheel = document.getElementById('qr_color');
+            if (colorWheel) {
+                colorWheel.value = '#000000';
+                // Trigger color sync
+                const event = new Event('input');
+                colorWheel.dispatchEvent(event);
+            }
+            
+            // Reset format to PNG
+            const pngOption = document.querySelector('input[value="png"]');
+            if (pngOption) {
+                pngOption.checked = true;
+                document.querySelectorAll('.format-option').forEach(opt => opt.classList.remove('selected'));
+                pngOption.closest('.format-option').classList.add('selected');
+            }
+            
+            // Reset download location
+            const downloadLocation = document.getElementById('download_location');
+            if (downloadLocation) {
+                downloadLocation.value = 'browser';
+            }
+            
+            // Hide preview and success actions
+            const previewImage = document.getElementById('previewImage');
+            const previewSection = document.getElementById('previewSection');
+            if (previewImage) previewImage.style.display = 'none';
+            if (previewSection) previewSection.classList.remove('show');
+            hideSuccessActions();
+            
+            // Remove any validation messages
+            const validationMessages = document.querySelectorAll('.validation-message');
+            validationMessages.forEach(msg => msg.remove());
+            
+            // Focus on URL input
+            if (urlInput) {
+                urlInput.focus();
+            }
+            
+            // Show success message
+            showMessage('Form reset! Ready to generate a new QR code.', 'success');
+        }
+        
+        // Copy URL to clipboard
+        async function copyUrlToClipboard() {
+            const urlInput = document.getElementById('url');
+            if (urlInput && urlInput.value) {
+                try {
+                    await navigator.clipboard.writeText(urlInput.value);
+                    showMessage('URL copied to clipboard!', 'success');
+                } catch (error) {
+                    // Fallback for older browsers
+                    urlInput.select();
+                    document.execCommand('copy');
+                    showMessage('URL copied to clipboard!', 'success');
+                }
+            }
         }
 
         // Show/hide server path input based on download location selection
@@ -2028,6 +2147,49 @@
                 urlInput._inputHandler = inputHandler;
                 urlInput._blurHandler = blurHandler;
             }
+            
+            // Add event listeners for success action buttons
+            const generateAnotherBtn = document.getElementById('generateAnotherBtn');
+            const copyUrlBtn = document.getElementById('copyUrlBtn');
+            
+            if (generateAnotherBtn) {
+                generateAnotherBtn.addEventListener('click', function() {
+                    resetFormForNewQR();
+                });
+            }
+            
+            if (copyUrlBtn) {
+                copyUrlBtn.addEventListener('click', function() {
+                    copyUrlToClipboard();
+                });
+            }
+            
+            // Add event listeners for quick URL buttons
+            const quickUrlBtns = document.querySelectorAll('.quick-url-btn');
+            quickUrlBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const urlInput = document.getElementById('url');
+                    if (urlInput) {
+                        urlInput.value = this.dataset.url;
+                        urlInput.style.borderColor = '#10b981'; // Green for valid
+                        
+                        // Trigger validation
+                        const event = new Event('input');
+                        urlInput.dispatchEvent(event);
+                        
+                        // Show success message
+                        showMessage(`Quick URL set: ${this.dataset.url}`, 'success');
+                    }
+                });
+                
+                // Add hover effects
+                btn.addEventListener('mouseenter', function() {
+                    this.style.background = '#e5e7eb';
+                });
+                btn.addEventListener('mouseleave', function() {
+                    this.style.background = '#f3f4f6';
+                });
+            });
             
             // Add cleanup on page unload
             window.addEventListener('beforeunload', function() {
