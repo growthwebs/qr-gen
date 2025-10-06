@@ -843,6 +843,17 @@
                 font-size: 0.875rem;
             }
             
+            /* Tablet-optimized download location buttons */
+            .download-option-btn {
+                padding: 14px 16px !important;
+                min-height: 85px;
+                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.1);
+            }
+            
+            .download-option-btn span:first-child {
+                font-size: 1.4rem !important;
+            }
+            
             .size-inputs {
                 gap: 16px;
             }
@@ -895,6 +906,18 @@
             
             .form-group label {
                 font-size: 0.8125rem;
+            }
+            
+            /* Mobile-optimized download location buttons */
+            .download-option-btn {
+                padding: 16px 12px !important;
+                font-size: 0.8125rem !important;
+                min-height: 80px;
+                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.1);
+            }
+            
+            .download-option-btn span:first-child {
+                font-size: 1.5rem !important;
             }
             
             .size-inputs, .format-options, .buttons {
@@ -1139,16 +1162,16 @@
         <main>
             <section class="qr-generator-section">
                 <form id="qrForm" method="POST" action="/generate" aria-label="QR Code Generator Form">
-                    <div class="form-group">
-                        <label for="url">Website URL</label>
-                        <input type="text" id="url" name="url" placeholder="https://example.com" required>
+            <div class="form-group">
+                <label for="url">Website URL</label>
+                <input type="text" id="url" name="url" placeholder="https://example.com" required>
                         <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
                             <button type="button" class="quick-url-btn" data-url="https://growthwebs.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">GrowthWebs</button>
                             <button type="button" class="quick-url-btn" data-url="https://instagram.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">Instagram</button>
                             <button type="button" class="quick-url-btn" data-url="https://facebook.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">Facebook</button>
                             <button type="button" class="quick-url-btn" data-url="https://youtube.com" style="background: #f3f4f6; border: 1px solid #d1d5db; padding: 4px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; transition: background 0.2s;">YouTube</button>
                         </div>
-                    </div>
+            </div>
 
             <div class="form-group">
                 <label>Size (QR codes are always square)</label>
@@ -1228,11 +1251,18 @@
             </div>
 
             <div class="form-group">
-                <label for="download_location">Download location</label>
-                <select id="download_location" name="download_location">
-                    <option value="browser">Save to Downloads folder</option>
-                    <option value="server">Save as...</option>
-                </select>
+                <label>Download location</label>
+                <div class="download-location-toggle" style="display: flex; gap: 8px; margin-top: 8px;">
+                    <button type="button" class="download-option-btn active" data-value="browser" style="flex: 1; padding: 12px 16px; border: 2px solid #667eea; background: #667eea; color: white; border-radius: 10px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span style="font-size: 1.25rem;">📥</span>
+                        <span>Downloads folder</span>
+                    </button>
+                    <button type="button" class="download-option-btn" data-value="server" style="flex: 1; padding: 12px 16px; border: 2px solid #d1d5db; background: white; color: #374151; border-radius: 10px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;">
+                        <span style="font-size: 1.25rem;">📂</span>
+                        <span>Choose location</span>
+                    </button>
+                </div>
+                <input type="hidden" id="download_location" name="download_location" value="browser">
             </div>
 
             <div class="form-group" id="server_path_group" style="display: none;">
@@ -1273,7 +1303,7 @@
                 <div style="display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px;">
                     <div style="width: 20px; height: 20px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
                         <span style="color: white; font-size: 12px; font-weight: bold;">✓</span>
-                    </div>
+        </div>
                     <h4 style="margin: 0; color: #1e40af; font-size: 1rem;">QR Code Generated Successfully!</h4>
                 </div>
                 <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;">
@@ -1609,7 +1639,7 @@
                 }
             }, 5000);
         }
-        
+
         // Show success actions after QR generation
         function showSuccessActions() {
             const successActions = document.getElementById('successActions');
@@ -1705,26 +1735,51 @@
             }
         }
 
-        // Show/hide server path input based on download location selection
-        document.getElementById('download_location').addEventListener('change', function() {
+        // Handle download location toggle buttons
+        const downloadOptionBtns = document.querySelectorAll('.download-option-btn');
+        const downloadLocationInput = document.getElementById('download_location');
             const serverPathGroup = document.getElementById('server_path_group');
-            if (this.value === 'server') {
-                serverPathGroup.style.display = 'block';
+        const generateBtn = document.getElementById('generateBtn');
+        
+        downloadOptionBtns.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const value = this.dataset.value;
+                
+                // Update active state
+                downloadOptionBtns.forEach(b => {
+                    b.classList.remove('active');
+                    if (b === this) {
+                        b.style.background = '#667eea';
+                        b.style.borderColor = '#667eea';
+                        b.style.color = 'white';
             } else {
-                serverPathGroup.style.display = 'none';
-            }
-        });
-
-
-
-        // Update button text based on download location
-        document.getElementById('download_location').addEventListener('change', function() {
-            const generateBtn = document.getElementById('generateBtn');
-            if (this.value === 'server') {
-                generateBtn.textContent = 'Generate & save as...';
+                        b.style.background = 'white';
+                        b.style.borderColor = '#d1d5db';
+                        b.style.color = '#374151';
+                    }
+                });
+                this.classList.add('active');
+                
+                // Update hidden input value
+                downloadLocationInput.value = value;
+                
+                // Show/hide server path input
+                if (value === 'server') {
+                    serverPathGroup.style.display = 'block';
+                    generateBtn.textContent = 'Generate & save as...';
             } else {
-                generateBtn.textContent = 'Generate & download';
-            }
+                    serverPathGroup.style.display = 'none';
+                    generateBtn.textContent = 'Generate & download';
+                }
+            });
+            
+            // Add touch feedback for mobile
+            btn.addEventListener('touchstart', function() {
+                this.style.transform = 'scale(0.98)';
+            });
+            btn.addEventListener('touchend', function() {
+                this.style.transform = 'scale(1)';
+            });
         });
 
         // Update size field when form is submitted
@@ -1769,28 +1824,28 @@
             generateBtn.textContent = 'Generating...';
             
             try {
-                const width = document.querySelector('input[name="width"]').value || '512';
-                const height = document.querySelector('input[name="height"]').value || '512';
-                
-                // Create hidden input for size
-                const sizeInput = document.createElement('input');
-                sizeInput.type = 'hidden';
-                sizeInput.name = 'size';
-                sizeInput.value = `${width}x${height}`;
-                this.appendChild(sizeInput);
+            const width = document.querySelector('input[name="width"]').value || '512';
+            const height = document.querySelector('input[name="height"]').value || '512';
+            
+            // Create hidden input for size
+            const sizeInput = document.createElement('input');
+            sizeInput.type = 'hidden';
+            sizeInput.name = 'size';
+            sizeInput.value = `${width}x${height}`;
+            this.appendChild(sizeInput);
 
-                // Handle file picker selection for server storage
-                const downloadLocation = document.getElementById('download_location').value;
-                if (downloadLocation === 'server') {
-                    const pathInput = document.getElementById('server_path');
-                    const hasDirectoryHandle = pathInput.dataset.handle === 'selected';
-                    
-                    if (hasDirectoryHandle) {
-                        // If a directory was selected via file picker, we'll handle it differently
-                        e.preventDefault();
-                        await handleFilePickerGeneration();
-                        return;
-                    }
+            // Handle file picker selection for server storage
+            const downloadLocation = document.getElementById('download_location').value;
+            if (downloadLocation === 'server') {
+                const pathInput = document.getElementById('server_path');
+                const hasDirectoryHandle = pathInput.dataset.handle === 'selected';
+                
+                if (hasDirectoryHandle) {
+                    // If a directory was selected via file picker, we'll handle it differently
+                    e.preventDefault();
+                    await handleFilePickerGeneration();
+                    return;
+                }
                 }
                 
                 // Allow normal form submission for browser download
@@ -2098,7 +2153,7 @@
                     const previewBtn = document.querySelector('.btn-preview');
                     if (previewBtn && !previewBtn.disabled) {
                         previewBtn.click();
-                    }
+                }
                 }
             };
             document.addEventListener('keydown', keyboardHandler);
@@ -2108,7 +2163,7 @@
             if (urlInput) {
                 // Real-time URL validation with visual feedback
                 const inputHandler = function() {
-                    const url = this.value.trim();
+                const url = this.value.trim();
                     
                     // Remove any existing validation messages
                     const existingMessage = document.querySelector('.validation-message');
@@ -2128,7 +2183,7 @@
                         if (validation.message) {
                             showValidationMessage(validation.message, null, 'info');
                         }
-                    } else {
+                } else {
                         this.style.borderColor = '#ef4444'; // Red for invalid
                     }
                 };
@@ -2136,7 +2191,7 @@
                 // Clear validation styling when field loses focus
                 const blurHandler = function() {
                     setTimeout(() => {
-                        this.style.borderColor = '#e1e5e9';
+                    this.style.borderColor = '#e1e5e9';
                     }, 100);
                 };
                 
