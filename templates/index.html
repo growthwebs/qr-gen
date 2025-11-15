@@ -843,17 +843,6 @@
                 font-size: 0.875rem;
             }
             
-            /* Tablet-optimized download location buttons */
-            .download-option-btn {
-                padding: 14px 16px !important;
-                min-height: 85px;
-                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.1);
-            }
-            
-            .download-option-btn span:first-child {
-                font-size: 1.4rem !important;
-            }
-            
             .size-inputs {
                 gap: 16px;
             }
@@ -906,18 +895,6 @@
             
             .form-group label {
                 font-size: 0.8125rem;
-            }
-            
-            /* Mobile-optimized download location buttons */
-            .download-option-btn {
-                padding: 16px 12px !important;
-                font-size: 0.8125rem !important;
-                min-height: 80px;
-                -webkit-tap-highlight-color: rgba(102, 126, 234, 0.1);
-            }
-            
-            .download-option-btn span:first-child {
-                font-size: 1.5rem !important;
             }
             
             .size-inputs, .format-options, .buttons {
@@ -1248,33 +1225,6 @@
                     <input type="checkbox" name="background">
                     <span>Include white background</span>
                 </label>
-            </div>
-
-            <div class="form-group">
-                <label>Download location</label>
-                <div class="download-location-toggle" style="display: flex; gap: 8px; margin-top: 8px;">
-                    <button type="button" class="download-option-btn active" data-value="browser" style="flex: 1; padding: 12px 16px; border: 2px solid #667eea; background: #667eea; color: white; border-radius: 10px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                        <span style="font-size: 1.25rem;">📥</span>
-                        <span>Downloads folder</span>
-                    </button>
-                    <button type="button" class="download-option-btn" data-value="server" style="flex: 1; padding: 12px 16px; border: 2px solid #d1d5db; background: white; color: #374151; border-radius: 10px; font-size: 0.875rem; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; flex-direction: column; align-items: center; gap: 4px;">
-                        <span style="font-size: 1.25rem;">📂</span>
-                        <span>Choose location</span>
-                    </button>
-                </div>
-                <input type="hidden" id="download_location" name="download_location" value="browser">
-            </div>
-
-            <div class="form-group" id="server_path_group" style="display: none;">
-                <label for="server_path">Choose download location</label>
-                <div style="display: flex; gap: 10px; align-items: center;">
-                    <input type="text" id="server_path" name="server_path" placeholder="Click 'Browse' to choose folder" readonly style="flex: 1;">
-                    <button type="button" id="browse_folder" class="btn-browse">Browse</button>
-                </div>
-                <small style="color: #666; font-size: 0.9rem; margin-top: 5px; display: block;">
-                    Choose a folder on your computer to save the QR code file.
-                    <br><em>Note: File picker works best in Chrome, Edge, or Opera browsers.</em>
-                </small>
             </div>
 
             <div class="buttons">
@@ -1693,12 +1643,6 @@
                 pngOption.closest('.format-option').classList.add('selected');
             }
             
-            // Reset download location
-            const downloadLocation = document.getElementById('download_location');
-            if (downloadLocation) {
-                downloadLocation.value = 'browser';
-            }
-            
             // Hide preview and success actions
             const previewImage = document.getElementById('previewImage');
             const previewSection = document.getElementById('previewSection');
@@ -1735,52 +1679,6 @@
             }
         }
 
-        // Handle download location toggle buttons
-        const downloadOptionBtns = document.querySelectorAll('.download-option-btn');
-        const downloadLocationInput = document.getElementById('download_location');
-            const serverPathGroup = document.getElementById('server_path_group');
-        const generateBtn = document.getElementById('generateBtn');
-        
-        downloadOptionBtns.forEach(btn => {
-            btn.addEventListener('click', function() {
-                const value = this.dataset.value;
-                
-                // Update active state
-                downloadOptionBtns.forEach(b => {
-                    b.classList.remove('active');
-                    if (b === this) {
-                        b.style.background = '#667eea';
-                        b.style.borderColor = '#667eea';
-                        b.style.color = 'white';
-            } else {
-                        b.style.background = 'white';
-                        b.style.borderColor = '#d1d5db';
-                        b.style.color = '#374151';
-                    }
-                });
-                this.classList.add('active');
-                
-                // Update hidden input value
-                downloadLocationInput.value = value;
-                
-                // Show/hide server path input
-                if (value === 'server') {
-                    serverPathGroup.style.display = 'block';
-                    generateBtn.textContent = 'Generate & save as...';
-            } else {
-                    serverPathGroup.style.display = 'none';
-                    generateBtn.textContent = 'Generate & download';
-                }
-            });
-            
-            // Add touch feedback for mobile
-            btn.addEventListener('touchstart', function() {
-                this.style.transform = 'scale(0.98)';
-            });
-            btn.addEventListener('touchend', function() {
-                this.style.transform = 'scale(1)';
-            });
-        });
 
         // Update size field when form is submitted
         document.getElementById('qrForm').addEventListener('submit', async function(e) {
@@ -1834,22 +1732,8 @@
             sizeInput.value = `${width}x${height}`;
             this.appendChild(sizeInput);
 
-            // Handle file picker selection for server storage
-            const downloadLocation = document.getElementById('download_location').value;
-            if (downloadLocation === 'server') {
-                const pathInput = document.getElementById('server_path');
-                const hasDirectoryHandle = pathInput.dataset.handle === 'selected';
-                
-                if (hasDirectoryHandle) {
-                    // If a directory was selected via file picker, we'll handle it differently
-                    e.preventDefault();
-                    await handleFilePickerGeneration();
-                    return;
-                }
-                }
-                
-                // Allow normal form submission for browser download
-                // The form will submit normally and redirect to download
+            // Allow normal form submission for browser download
+            // The form will submit normally and redirect to download
                 
             } catch (error) {
                 console.error('Error during form submission:', error);
@@ -1863,121 +1747,6 @@
             }
         });
 
-        // Handle generation with file picker
-        async function handleFilePickerGeneration() {
-            try {
-                const form = document.getElementById('qrForm');
-                const formData = new FormData(form);
-                
-                // Get size values
-                const width = document.querySelector('input[name="width"]').value || '512';
-                const height = document.querySelector('input[name="height"]').value || '512';
-                formData.set('size', `${width}x${height}`);
-                
-                // Remove width and height from form data
-                formData.delete('width');
-                formData.delete('height');
-                
-                // Generate QR code first
-                const response = await fetch('/generate', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    // Get the generated file
-                    const blob = await response.blob();
-                    
-                    // Get the directory handle from the file picker
-                    const pathInput = document.getElementById('server_path');
-                    const directoryHandle = window.selectedDirectoryHandle;
-                    
-                    if (directoryHandle) {
-                        // Generate filename
-                        const url = formData.get('url');
-                        const format = formData.get('format');
-                        const filename = generateFilenameFromUrl(url) + '.' + format;
-                        
-                        // Save to selected directory
-                        const fileHandle = await directoryHandle.getFileHandle(filename, { create: true });
-                        const writable = await fileHandle.createWritable();
-                        await writable.write(blob);
-                        await writable.close();
-                        
-                        alert(`QR code saved successfully as: ${filename}`);
-                    }
-                } else {
-                    const errorText = await response.text();
-                    alert('Error generating QR code: ' + errorText);
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                alert('Error saving file: ' + error.message);
-            }
-        }
-
-        // Store directory handle globally for later use
-        let selectedDirectoryHandle = null;
-        
-        // Enhanced file picker with better compatibility
-        document.getElementById('browse_folder').addEventListener('click', async function() {
-            try {
-                // Check for File System Access API support
-                if ('showDirectoryPicker' in window) {
-                    const directoryHandle = await window.showDirectoryPicker();
-                    const pathInput = document.getElementById('server_path');
-                    pathInput.value = directoryHandle.name;
-                    pathInput.dataset.handle = 'selected';
-                    window.selectedDirectoryHandle = directoryHandle; // Store globally
-                    
-                    showMessage('Folder selected: ' + directoryHandle.name, 'success');
-                } else {
-                    // Fallback for unsupported browsers
-                    const pathInput = document.getElementById('server_path');
-                    const customPath = prompt('Enter a folder path (e.g., ./downloads):', './downloads');
-                    if (customPath) {
-                        pathInput.value = customPath;
-                        pathInput.dataset.handle = 'manual';
-                        showMessage('Custom path set: ' + customPath, 'success');
-                    }
-                }
-            } catch (error) {
-                if (error.name !== 'AbortError') {
-                    console.error('Error selecting directory:', error);
-                    showMessage('Error selecting directory. Please try again or enter a path manually.', 'error');
-                }
-            }
-        });
-
-        // Helper function to generate filename from URL (same logic as backend)
-        function generateFilenameFromUrl(url) {
-            try {
-                const urlObj = new URL(url);
-                let domain = urlObj.hostname.toLowerCase();
-                domain = domain.replace(/^www\./, '').replace(/^m\./, '');
-                
-                let path = urlObj.pathname.replace(/^\//, '');
-                const pathParts = path.split('/').filter(p => p && p.length > 1).slice(0, 3);
-                
-                const filenameParts = [domain.replace(/\./g, '_')];
-                pathParts.forEach(part => {
-                    const cleanPart = part.replace(/[^a-zA-Z0-9_-]/g, '_').replace(/_+/g, '_').replace(/^_|_$/g, '');
-                    if (cleanPart && cleanPart.length > 1) {
-                        filenameParts.push(cleanPart);
-                    }
-                });
-                
-                let filename = filenameParts.join('_');
-                if (filename.length > 50) {
-                    filename = filename.substring(0, 50).replace(/_$/, '');
-                }
-                
-                return filename || 'qr_code';
-            } catch (error) {
-                return 'qr_code';
-            }
-        }
-        
         // Sync width to height to keep QR code square
         function syncDimensions() {
             const widthInput = document.getElementById('width');
